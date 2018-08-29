@@ -7,7 +7,6 @@ rpcallowip=$RPCALLOW
 rpcport=6666
 txindex=1
 addnode=207.246.95.254:1234
-addnode=140.82.11.40:1234
 addnode=144.202.3.244:1234
 addnode=149.28.232.58:1234
 addnode=107.191.42.125:1234
