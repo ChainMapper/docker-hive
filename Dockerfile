@@ -1,16 +1,26 @@
-FROM chainmapper/walletbase-xenial
-	
-ENV WALLET_URL=https://github.com/HIVENetwork1/HIVE/releases/download/v1.0/hive-linux.zip
+FROM chainmapper/walletbase-xenial-build as builder
 
-RUN wget $WALLET_URL -O /tmp/wallet.zip \
-	&& unzip -j /tmp/wallet.zip -d /usr/local/bin \
-	&& chmod +x /usr/local/bin/*
+ENV GIT_COIN_URL    https://github.com/ChainMapper/HIVE.git
+ENV GIT_COIN_NAME   hive   
 
-#rpc port & mainport
-EXPOSE 6666 1234
+RUN	git clone $GIT_COIN_URL $GIT_COIN_NAME \
+	&& cd $GIT_COIN_NAME \
+	&& chmod +x autogen.sh \
+	&& chmod +x share/genbuild.sh \
+	&& chmod +x src/leveldb/build_detect_platform \
+	&& ./autogen.sh && ./configure \
+	&& make \
+	&& make install
+
+FROM chainmapper/walletbase-xenial as runtime
+
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 RUN mkdir /data
 ENV HOME /data
+
+#rpc port & mainport
+EXPOSE 6666 1234
 
 COPY start.sh /start.sh
 COPY gen_config.sh /gen_config.sh
